@@ -1,0 +1,21 @@
+.content {
+    padding: 30px;
+    padding-top: 10px;
+}
+.settings-group {
+    padding: 10px;
+    display: inline-block;
+}
+paper-item > span  {
+   margin-left: 25px;
+}
+.logout {
+    float: right;
+}
+.verification-panel {
+  display: inline-block;
+  padding: 15px;
+}
+.verificationString {
+  display: inline-block;
+}

@@ -1,0 +1,62 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<dom-module is="pl-ajax">
+  <template>
+    <iron-ajax id="ironAjax" url="{{url}}" method="post" on-response="handleResponse" handle-as="json"></iron-ajax>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: "pl-ajax",
+    properties: {
+      url: String,
+      cache: String,
+      body: String
+    },
+    generateRequest: function(force) {
+      var isAuthenticated = JSON.parse(localStorage.getItem('isAuthenticated'));
+      if (isAuthenticated != null && isAuthenticated === true) {
+        if (this.body !== undefined)
+          this.$.ironAjax.params = this.body;
+        if (this.cache != null) {
+          var cachedItem = localStorage.getItem(this.cache);
+          if (cachedItem !== 'undefined')
+            cachedItem = JSON.parse(cachedItem);
+          if (cachedItem == null || isExpired(cachedItem) || force)
+            this.$.ironAjax.generateRequest();
+          else
+            this.fire('response', cachedItem);
+        } else {
+          this.$.ironAjax.generateRequest();
+        }
+      } else {
+        console.log('isAuth is false?');
+        document.querySelector('app-router').go('/');
+      }
+    },
+    handleResponse: function(r) {
+      var parsedResponse = r.detail.response;
+      r.stopPropagation();
+      r.preventDefault();
+      if (typeof(parsedResponse.isAuthenticated) === 'undefined')
+        this.fire('response', parsedResponse);
+      else {
+        localStorage.clear();
+        document.querySelector('app-router').go('/');
+      }
+    }
+  });
+
+
+  function isExpired(obj, minutes) {
+    if (obj != null) {
+      var objDate = new Date(obj.date);
+      var thirtyMinutesAgo = new Date(new Date() - 30 * 60000);
+      if (objDate <= thirtyMinutesAgo) {
+        return true;
+      }
+    }
+    return false;
+  }
+</script>

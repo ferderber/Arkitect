@@ -1,0 +1,136 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/pushstate-anchor/pushstate-anchor.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+
+<dom-module id="pl-navigation">
+
+  <link rel="import" type="css" href="css/pl-navigation.css">
+  <template>
+    <nav>
+      <paper-tabs id="tabNavigation" selected="0" noink no-slide>
+        <paper-tab id="homeTab" link>
+          <a id="homeLink" name="home" href="#!/" on-click="linkHandler" class="logo horizontal center-center layout">
+            <h1>Pleblvl</h1>
+            <!--<img src="../images/templogo.png" width="128px" height="48px">-->
+          </a>
+        </paper-tab>
+        <paper-tab id="arkTab" hidden="{{!isAuthenticated}}" link>
+          <a id="arkLink" name="ark" href="#!/ark" on-click="linkHandler" class="horizontal center-center layout">
+            <h3>Ark</h3>
+          </a>
+        </paper-tab>
+        <!--<paper-tab id="userTab" hidden="{{!isAuthenticated}}" link>
+          <a id="userLink" name="user" href="#!/user" on-click="linkHandler" class="horizontal center-center layout">
+            <h3>Profile</h3>
+          </a>
+        </paper-tab>-->
+        <paper-tab id="loginTab" hidden="{{isAuthenticated}}" link>
+          <a id="loginLink" name="login" href="#!/login" on-click="linkHandler" class="horizontal center-center layout">
+            <h3>Login</h3>
+          </a>
+        </paper-tab>
+        <paper-tab id="signupTab" hidden="{{isAuthenticated}}" link>
+          <a id="signupLink" name="signup" href="#!/signup" on-click="linkHandler" class="horizontal center-center layout">
+            <h3>Signup</h3>
+          </a>
+        </paper-tab>
+        <paper-tab id="settingsTab" hidden="{{!isAuthenticated}}" link>
+          <a id="settingsLink" name="settings" href="#!/settings" on-click="linkHandler" class="horizontal center-center layout">
+            <iron-icon icon="settings"></iron-icon>
+          </a>
+        </paper-tab>
+      </paper-tabs>
+    </nav>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'pl-navigation',
+    properties: {
+      isAuthenticated: {
+        type: Boolean,
+        notify: true
+      }
+    },
+    listeners: {
+      'stateChange': 'stateChangeHandler'
+    },
+    ready: function() {
+      this.isAuthenticated = JSON.parse(localStorage.getItem('isAuthenticated'));
+      // var links = this.$.tabNavigation.querySelectorAll('#tabsContainer div paper-tab div a');
+      // for (var i = 0; i < links.length; i++) {
+      //   links[i].onclick = this.linkHandler;
+      // }
+      // cool code keep it for later
+    },
+    attached: function() {
+      this.changeNavigation(window.location.href.substring(window.location.href.indexOf('#') + 1));
+    },
+    stateChangeHandler: function(e) {
+      this.isAuthenticated = JSON.parse(localStorage.getItem('isAuthenticated'));
+      this.setNavigation();
+      this.changeNavigation(e.detail.path);
+    },
+    setNavigation: function() {
+      if (this.isAuthenticated) {
+        this.$.settingsTab.hidden = false;
+        // this.$.userTab.hidden = false;
+        this.$.arkTab.hidden = false;
+        this.$.homeTab.hidden = false;
+        this.$.loginTab.hidden = true;
+        this.$.signupTab.hidden = true;
+      } else {
+        this.$.settingsTab.hidden = true;
+        // this.$.userTab.hidden = true;
+        this.$.arkTab.hidden = true;
+        this.$.homeTab.hidden = false;
+        this.$.loginTab.hidden = false;
+        this.$.signupTab.hidden = false;
+      }
+    },
+    changeNavigation: function(path) {
+      var urls = [{
+          path: '/',
+          control: 'homeLink'
+        }, {
+          path: '/ark',
+          control: 'arkLink'
+        },
+        // {
+        //   path: '/user',
+        //   control: 'userLink'
+        // },
+        {
+          path: '/login',
+          control: 'loginLink'
+        }, {
+          path: '/signup',
+          control: 'signupLink',
+        }, {
+          path: '/settings',
+          control: 'settingsLink'
+        }
+      ];
+      for (var i = 0; i < urls.length; i++) {
+        if (path.toLowerCase().indexOf(urls[i].path) !== -1) {
+          document.getElementById('tabNavigation').selected = i;
+        }
+      }
+    },
+    linkHandler: function(e) {
+      if (window.location.href.indexOf(e.currentTarget.href) !== -1 && e.currentTarget.href === window.location.href) {
+        e.preventDefault();
+        return false;
+      } else {
+        this.isAuthenticated = JSON.parse(localStorage.getItem('isAuthenticated'));
+        this.changeNavigation(e.currentTarget.href);
+        this.setNavigation();
+      }
+      return false;
+    }
+  });
+</script>

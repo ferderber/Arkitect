@@ -1,0 +1,52 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+
+<dom-module id="pl-login">
+  <link rel="stylesheet" href="css/pl-login.css">
+  <template>
+    <form is="iron-form" id="login" class="center-center" method="POST" action="../auth/login" content-type="application/json" headers="{'Accept': 'application/json'}" handle-as="json" on-iron-form-response="loginResponse">
+      <paper-material>
+        <paper-input name="email" type="email" label="Email"></paper-input>
+        <paper-input name="password" label="Password" type="password"></paper-input>
+        <paper-button raised on-click="submitLogin">Login</paper-button>
+      </paper-material>
+    </form>
+    <paper-toast id="loginMessage" text="Invalid Login" duration="5000"></paper-toast>
+    <iron-localstorage id="authStorage" name="isAuthenticated" value="{{isAuthenticated}}"></iron-localstorage>
+  </template>
+  <script>
+    Polymer({
+      is: 'pl-login',
+      properties: {
+        isAuthenticated: {
+          type: Boolean,
+          notify: true
+        },
+        isVerified: Boolean,
+        verificationString: String
+      },
+      loginResponse: function(r) {
+        if (r.detail.isAuthenticated) {
+          localStorage.setItem('isAuthenticated', true);
+          console.log('Logged in');
+          document.querySelector('app-router').go('/ark');
+        } else {
+          this.isAuthenticated = false;
+          this.$.loginMessage.text = r.detail.message;
+          this.$.loginMessage.show();
+        }
+      },
+      submitLogin: function() {
+        var form = document.querySelector('#login');
+        form.submit();
+      }
+    });
+  </script>
+</dom-module>

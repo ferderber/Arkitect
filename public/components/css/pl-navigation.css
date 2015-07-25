@@ -1,0 +1,16 @@
+paper-tabs {
+  background-color: var(--paper-indigo-500);
+  color: #fff;
+  --paper-tabs-selection-bar-color: var(--paper-red-400);
+}
+a {
+  color: #fff;
+  text-decoration: none;
+}
+a.disabled {
+  pointer-events: none;
+}
+.disabled {
+  display: none;
+  pointer-events: none;
+}

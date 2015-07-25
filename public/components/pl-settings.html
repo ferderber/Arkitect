@@ -1,0 +1,75 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="pl-ajax.html">
+
+
+<dom-module id="pl-settings">
+  <link rel="stylesheet" href="css/pl-settings.css">
+  <template>
+
+    <paper-material class="content" elevation="3">
+      <div class="logout">
+        <paper-button id="logout" name="Logout" on-click="logoutClick" raised>Logout</paper-button>
+      </div>
+      <div class="list">
+        <h4>Test thing thing</h4>
+        <paper-material class="settings-group" elevation="2">
+          <paper-item>
+            <paper-toggle-button></paper-toggle-button>
+            <span>Item 1</span>
+          </paper-item>
+          <paper-item>
+            <paper-toggle-button></paper-toggle-button>
+            <span>Item 2</span>
+          </paper-item>
+          <paper-item>
+            <paper-toggle-button></paper-toggle-button>
+            <span>Item 3</span>
+          </paper-item>
+          <paper-item>
+            <paper-toggle-button></paper-toggle-button>
+            <span>Item 4</span>
+          </paper-item>
+        </paper-material>
+      </div>
+    </paper-material>
+    <pl-ajax id="logoutAjax" url="/auth/logout" method="post" on-response="logoutResponse">
+    </pl-ajax>
+    <iron-localstorage id="authStorage" name="isAuthenticated" value="{{isAuthenticated}}"></iron-localstorage>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: 'pl-settings',
+    properties: {
+      isAuthenticated: {
+        type: Boolean,
+        notify: true
+      },
+      verificationString: {
+        type: String,
+        notify: true
+      }
+    },
+    verificationChanged: function(r) {
+      console.log(r);
+    },
+    logoutClick: function() {
+      this.$.logoutAjax.generateRequest();
+      localStorage.clear();
+    },
+    logoutResponse: function(r) {
+      this.isAuthenticated = false;
+      document.querySelector('app-router').go('/');
+      // MoreRouting.navigateTo('home');
+    }
+  });
+</script>

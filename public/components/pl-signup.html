@@ -1,0 +1,63 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
+
+<link rel="stylesheet" href="css/pl-signup.css">
+
+<dom-module id="pl-signup">
+  <template>
+
+    <form is="iron-form" id="signup" method="POST" action="../auth/signup" content-type="application/json" headers='{"Accept": "application/json"}' handle-as="json" on-iron-form-response="signupResponse">
+      <paper-material elevation="3">
+        <paper-input name="email" type="email" label="Email"></paper-input>
+        <paper-input name="password" label="Password" type="password"></paper-input>
+        <br/>
+        <paper-button raised onclick="submitSignup()">Signup</paper-button>
+      </paper-material>
+    </form>
+    <iron-localstorage id="authenticatedStorage" name="isAuthenticated" value="{{isAuthenticated}}"></iron-localstorage>
+    <iron-localstorage name="verificationString" value="{{verificationString}}"></iron-localstorage>
+    <iron-localstorage name="isVerified" value="{{isVerified}}"></iron-localstorage>
+    <paper-toast id="signupMessage" text="Invalid login" duration="5000"></paper-toast>
+  </template>
+  <script>
+    Polymer({
+      is: 'pl-signup',
+      ready: function() {},
+      properties: {
+        isAuthenticated: {
+          type: Boolean,
+          notify: true
+        },
+        isVerified: Boolean,
+        verificationString: String
+      },
+      signupResponse: function(r) {
+        if (r.detail.isAuthenticated) {
+          this.isAuthenticated = true;
+          this.$.authenticatedStorage.save();
+          this.isVerified = r.detail.isVerified;
+          this.verificationString = r.detail.verificationString;
+          document.querySelector('app-router').go('/ark');
+        } else {
+          this.isAuthenticated = false;
+          this.$.signupMessage.text = r.detail.message;
+          this.$.signupMessage.show();
+        }
+      },
+    });
+    function submitSignup() {
+      var signupForm = document.querySelector('#signup');
+      var thing = signupForm.serialize();
+      console.log(thing);
+      signupForm.submit();
+    }
+  </script>
+</dom-module>

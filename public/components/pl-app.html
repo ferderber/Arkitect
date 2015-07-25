@@ -1,0 +1,42 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+<link rel="import" href="../bower_components/pushstate-anchor/pushstate-anchor.html">
+<link rel="import" href="../bower_components/app-router/app-router.html">
+<link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="pl-navigation.html">
+
+<dom-module id="pl-app">
+  <link rel="stylesheet" href="css/pl-app.css">
+  <template>
+    <pl-navigation id="navigation"></pl-navigation>
+    <app-router mode="hash" id="router">
+      <app-route path="/" import="/components/pl-home.html"></app-route>
+      <app-route path="/home" import="/components/pl-home.html"></app-route>
+      <app-route path="/signup" import="/components/pl-signup.html"></app-route>
+      <app-route path="/login" import="/components/pl-login.html"></app-route>
+      <app-route path="/ark" import="/components/pl-ark.html"></app-route>
+      <app-route path="/settings" import="/components/pl-settings.html"></app-route>
+    </app-router>
+    <iron-localstorage id="authStorage" name="isAuthenticated" value="{{isAuthenticated}}"></iron-localstorage>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'pl-app',
+    properties: {
+      isAuthenticated: {
+        type: Boolean,
+        notify: true
+      }
+    },
+    ready: function() {
+      document.querySelector('#router').addEventListener('state-change', this.stateChange.bind(this));
+    },
+    stateChange: function(e) {
+      console.log('test');
+      this.$.navigation.fire('stateChange', e.detail);
+
+    },
+  });
+</script>
