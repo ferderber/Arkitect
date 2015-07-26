@@ -4,7 +4,7 @@ switch (process.env.NODE_ENV) {
     config = {
       db: 'mongodb://localhost/Arkitect',
       redis: process.env.REDIS_URL || '127.0.0.1',
-      arkConfig: './README.md',
+      arkConfig: process.env.ARK_CONFIG || './README.md',
       arkAddress: process.env.ARK_ADDRESS,
       arkPassword: process.env.ARK_PASSWORD,
       arkPort: process.env.ARK_PORT,
@@ -18,7 +18,7 @@ switch (process.env.NODE_ENV) {
       arkAddress: process.env.ARK_ADDRESS,
       arkPassword: process.env.ARK_PASSWORD,
       arkPort: process.env.ARK_PORT,
-      arkConfig: '/home/steam/games/ark/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini',
+      arkConfig: process.env.ARK_CONFIG || '/home/steam/games/ark/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini',
       port: process.env.PORT
     };
     break;
@@ -29,7 +29,7 @@ switch (process.env.NODE_ENV) {
       arkAddress: process.env.ARK_ADDRESS,
       arkPassword: process.env.ARK_PASSWORD,
       arkPort: process.env.ARK_PORT,
-      arkConfig: '/home/steam/games/ark/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini',
+      arkConfig: process.env.ARK_CONFIG || '/home/steam/games/ark/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini',
       port: 3000
     };
     break;
