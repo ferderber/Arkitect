@@ -12,50 +12,37 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <!--<link rel="import" href="lq-ajax.html">
 <link rel="import" href="lq-quest.html">-->
-
 <dom-module id="pl-ark">
   <link rel="import" type="css" href="css/pl-ark.css">
   <template>
-    <paper-material id="serverStatus" elevation="2" class="status">
+    <paper-material id="serverStatus" elevation="2" class="status-container">
       <div>
         <h2>Server Status</h2>
         <paper-material class="chat-container">
-        <paper-material class="chat-box">
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-            <div class="chat-line">test qweerty</div>
-        </paper-material>
-        <paper-input id="commandInput" name="commandInput" label="Command/Message"></paper-input>
+          <paper-material class="chat-box">
+            <template is="dom-repeat" items="{{chat}}">
+              <div class="chat-line">{{item.message}}</div>
+            </template>
+          </paper-material>
+          <paper-input id="commandInput" name="commandInput" label="Command/Message"></paper-input>
         </paper-material>
         <paper-material class="player-list">
-          <h4>Players (<span>{{players.length}}</span>/70)</h4>
+          <h4>Players (
+            <span>{{players.length}}</span>/70)</h4>
           <ul>
-          <template>
-            
-          </template>
-          </ul>  
+            <template is="dom-repeat" items="{{players}}" as="player">
+              <li>
+                <span>{{player.name}}</span>
+              </li>
+            </template>
+          </ul>
         </paper-material>
       </div>
     </paper-material>
-    <paper-material elevation="4" class="quest-list">
+    <paper-material elevation="4" class="config-container">
       <div>
-      <paper-textarea id="arkConfig" label="GameUserSettings.ini" value="{{arkConfig}}"></paper-textarea>
-      <paper-button on-click="saveConfig" raised>Save Config</paper-button>
+        <paper-textarea id="arkConfig" label="GameUserSettings.ini" value="{{arkConfig}}"></paper-textarea>
+        <paper-button on-click="saveConfig" raised>Save Config</paper-button>
       </div>
     </paper-material>
     <paper-fab mini icon="refresh" on-click="refreshContent" style="position: fixed; bottom: 5px; right: 5px;"></paper-fab>
@@ -72,15 +59,37 @@
       players: {
         type: Array,
         notify: true
+      },
+      chat: {
+        type: Array,
+        notify: true
       }
     },
     ready: function() {
       io.on('arkConfig', function(config) {
         this.arkConfig = config;
       }.bind(this));
+      this.players = [];
+      this.chat = [];
       io.on('players', function(players) {
-        var playersList = players.split(/\\n\d\. /);
-        console.log(playersList);
+        this.players = [];
+        var playersList = players.split(/\n\d\. /);
+        playersList.splice(0, 1);
+        playersList[playersList.length - 1] = playersList[playersList.length -1].substring(0, playersList[playersList.length -1].indexOf('\n') -1);
+        for(var i = 0; i < playersList.length; i++) {
+          var idIndex = playersList[i].indexOf(', ');
+          this.push('players', {'name': playersList[i].substring(0, idIndex), 'id': playersList[i].substring(idIndex + 2)});
+        }
+      }.bind(this));
+      io.on('chat', function(chat) {
+        if(chat.indexOf('Server received') !== 0) {
+        var messages = chat.split(/\n/);
+        for(var i = 0; i < messages.length; i++) {
+          if(messages[i].length >= 2)
+          this.push('chat', {'message': messages[i]});
+        }
+        } else {
+        }
       }.bind(this));
       io.emit('ready');
     },

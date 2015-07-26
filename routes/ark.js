@@ -2,15 +2,13 @@ module.exports = function (io) {
   var Rcon = require('simple-rcon');
   var fs = require('fs');
   var config = require('../configs.js');
-  var options = {
-    tcp: true,
-    challenge: false
-  };
+
   var conn = new Rcon(
     config.arkAddress,
     config.arkPort,
     config.arkPassword);
   conn.on('authenticated', function () {
+    updateLoop();
     console.log('Authenticated');
   });
   conn.on('error', function (e) {
@@ -22,22 +20,20 @@ module.exports = function (io) {
   conn.on('error', function (e) {
     console.log('error: ' + e);
   });
-
   io.route('ready', function (req) {
     console.log('send');
     conn.exec('getchat', function (chat) {
-      console.log(chat);
-      conn.exec('serverchat testtest', function (chat) {
-        console.log(chat);
-        conn.exec('listplayers', function (players) {
-          req.io.broadcast('players', players.body);
-          console.log(players);
-        });
+      // conn.exec('serverchat testtest', function (chat) {
+      // console.log(chat);
+      conn.exec('listplayers', function (players) {
+        io.broadcast('players', players.body);
+        console.log(players);
       });
+      // });
     });
     sendArkConfig(req.io);
   });
-  fs.watchFile(config.ark, function (curr, prev) {
+  fs.watchFile(config.arkConfig, function (curr, prev) {
     console.log('change');
   });
   io.route('saveConfig', function (req) {
@@ -45,10 +41,18 @@ module.exports = function (io) {
     updateClientConfig(req, req.data);
   });
 
+  function updateLoop() {
+    setInterval(updateData, 10000);
+    setInterval(updateChat, 1000);
+  }
+
   function updateData() {
     conn.exec('listplayers', function (players) {
       io.broadcast('players', players.body);
     });
+  }
+  function updateChat() {
+
     conn.exec('getchat', function (chat) {
       io.broadcast('chat', chat.body);
     });

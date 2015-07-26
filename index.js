@@ -78,7 +78,7 @@ function setupUsers() {
         group: 'admin'
       });
       var shep = new User({
-        name: '',
+        name: 'name',
         email: 'shep@gmail.com',
         password: 'testUser',
         group: 'admin'

@@ -1,8 +1,11 @@
-.status {
+.status-container {
   padding: 20px;
 }
-.status > div {
+.status-container > div {
   margin-bottom: 20px;
+}
+.config-container {
+  padding: 20px;
 }
 
 paper-progress {
